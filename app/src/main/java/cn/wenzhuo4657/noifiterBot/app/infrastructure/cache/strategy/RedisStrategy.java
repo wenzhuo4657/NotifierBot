@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import cn.wenzhuo4657.noifiterBot.app.config.CacheConfiguration;
 import cn.wenzhuo4657.noifiterBot.app.config.CacheConfiguration.Redis;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -23,14 +24,15 @@ public class RedisStrategy  extends   abstractCacheStrategy{
         Redis redis = cacheConfiguration.getRedis();
         Config config = new Config();
         config.useSingleServer()
-                .setAddress(redis.getHost()+":"+redis.getPort())
-                .setPassword(redis.getPassword())
+                .setAddress("redis://"+redis.getHost()+":"+redis.getPort())
                 .setDatabase(redis.getDatabase())
                 .setConnectionPoolSize(redis.getConnectionPoolSize())
                 .setConnectionMinimumIdleSize(redis.getConnectionMinimumIdleSize())
                 .setTimeout(redis.getTimeout())
                 .setRetryAttempts(redis.getRetryAttempts())
                 .setRetryInterval(redis.getRetryInterval());
+        if(!StringUtils.isEmpty(redis.getPassword()))
+            config.useSingleServer().setPassword(redis.getPassword());
 
         redissonClient = Redisson.create(config);
 

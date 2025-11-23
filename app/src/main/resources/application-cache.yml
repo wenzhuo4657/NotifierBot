@@ -12,7 +12,7 @@ cache:
 
   # Redis 配置 (使用Redisson客户端)
   redis:
-    host: localhost
+    host:  ${HOST1}
     port: 6379
     password: # 如果没有密码，留空
     database: 0
