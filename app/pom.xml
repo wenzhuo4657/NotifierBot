@@ -48,6 +48,10 @@
 
         <!-- Maven编译器插件版本 -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+
+        <telegrambots.version>9.2.0</telegrambots.version>
+        <wechaty.version>0.1.5-SNAPSHOT</wechaty.version>
+        <redisson.version>3.52.0</redisson.version>
     </properties>
 
     <!-- ==================== 依赖管理 ==================== -->
@@ -57,6 +61,32 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots-longpolling</artifactId>
+            <version>${telegrambots.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots-client</artifactId>
+            <version>${telegrambots.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots-abilities</artifactId>
+            <version>${telegrambots.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>${redisson.version}</version>
         </dependency>
 
 
