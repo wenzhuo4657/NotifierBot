@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import cn.wenzhuo4657.noifiterBot.app.config.CacheConfiguration;
 import cn.wenzhuo4657.noifiterBot.app.config.CacheConfiguration.Redis;
+import cn.wenzhuo4657.noifiterBot.app.types.cache.CacheType;
 import org.redisson.api.RScript;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
@@ -21,6 +22,12 @@ public class RedisStrategy  extends   abstractCacheStrategy{
 
     public RedisStrategy(CacheConfiguration cacheConfiguration) {
         super(cacheConfiguration);
+    }
+
+
+    @Override
+    public String name() {
+        return CacheType.REDIS.getName();
     }
 
 

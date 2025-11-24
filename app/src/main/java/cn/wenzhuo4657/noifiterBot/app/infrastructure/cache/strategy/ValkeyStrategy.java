@@ -1,6 +1,7 @@
 package cn.wenzhuo4657.noifiterBot.app.infrastructure.cache.strategy;
 
 import cn.wenzhuo4657.noifiterBot.app.config.CacheConfiguration;
+import cn.wenzhuo4657.noifiterBot.app.types.cache.CacheType;
 
 import java.util.concurrent.TimeUnit;
 
@@ -8,6 +9,13 @@ public class ValkeyStrategy  extends   abstractCacheStrategy {
 
     public ValkeyStrategy(CacheConfiguration cacheConfiguration) {
         super(cacheConfiguration);
+    }
+
+
+
+    @Override
+    public String name() {
+        return CacheType.VALKEY.getName();
     }
 
     @Override

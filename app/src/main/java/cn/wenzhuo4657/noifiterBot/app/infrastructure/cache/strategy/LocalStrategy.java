@@ -3,6 +3,7 @@ package cn.wenzhuo4657.noifiterBot.app.infrastructure.cache.strategy;
 import cn.wenzhuo4657.noifiterBot.app.config.CacheConfiguration;
 import cn.wenzhuo4657.noifiterBot.app.types.Exception.AppException;
 import cn.wenzhuo4657.noifiterBot.app.types.Exception.ResponseCode;
+import cn.wenzhuo4657.noifiterBot.app.types.cache.CacheType;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +15,12 @@ public class LocalStrategy extends abstractCacheStrategy {
 
     public LocalStrategy(CacheConfiguration cacheConfiguration) {
         super(cacheConfiguration);
+    }
+
+
+    @Override
+    public String name() {
+        return CacheType.LOCAL.getName();
     }
 
     @Override

@@ -20,8 +20,11 @@ public abstract class abstractCacheStrategy implements CacheStrategy {
      * 构建key
      */
     public String buildKey(String key){
-        return cacheConfiguration.getKeyPrefix() + key;
+        return cacheConfiguration.getKeyPrefix() + ":" +name()+ ":"+key;
     }
+
+    public abstract String name();
+
 
     /**
      * 默认的Lua脚本执行实现 - 不支持
