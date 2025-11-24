@@ -1,5 +1,6 @@
 package cn.wenzhuo4657.noifiterBot.app.infrastructure.cache.strategy;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -89,4 +90,29 @@ public interface CacheStrategy {
      * @return 是否可用
      */
     boolean isAvailable();
+
+    /**
+     * 执行Lua脚本
+     * @param luaScript Lua脚本内容
+     * @param keys 脚本中使用的键列表
+     * @param values 脚本中使用的值列表
+     * @return 脚本执行结果
+     */
+    <T> T executeLuaScript(String luaScript, List<String> keys, List<Object> values, Class<T> resultType);
+
+    /**
+     * 执行Lua脚本（SHA1哈希，用于预加载的脚本）
+     * @param scriptSha1 脚本的SHA1哈希值
+     * @param keys 脚本中使用的键列表
+     * @param values 脚本中使用的值列表
+     * @return 脚本执行结果
+     */
+    <T> T executeLuaScriptSha1(String scriptSha1, List<String> keys, List<Object> values, Class<T> resultType);
+
+    /**
+     * 加载Lua脚本到Redis服务器并返回SHA1哈希值
+     * @param luaScript Lua脚本内容
+     * @return 脚本的SHA1哈希值
+     */
+    String loadLuaScript(String luaScript);
 }

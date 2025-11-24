@@ -22,9 +22,11 @@
 local key_name = KEYS[1]
 local max_qps = tonumber(ARGV[1])
 
+
 -- 检查参数有效性
 if not key_name or not max_qps or max_qps <= 0 then
-    return redis.error_reply('Invalid parameters: key_name and max_qps must be provided and max_qps must be positive')
+        local error_message = "Invalid parameters received. key_name: " .. tostring(key_name) .. ", max_qps: " .. tostring(max_qps) .. ". Both must be provided and max_qps must be positive."
+        return redis.error_reply(error_message)
 end
 
 -- 获取当前计数
