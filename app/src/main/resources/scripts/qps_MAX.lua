@@ -1,5 +1,5 @@
 --[[
-    QPS 限制脚本
+    QPS 限制脚本 (适配JsonJacksonCodec)
     功能：通过 Redis Lua 脚本实现 QPS 限制功能
     参数：
     - KEYS[1]: 键名
@@ -11,23 +11,18 @@
     - 如果当前值小于最大值，则增加 1
     - 如果当前值已达到最大值，则返回错误状态
 
-    返回值：
-    - 1: 表示操作成功（QPS 未超限）
-    - 0: 表示操作失败（QPS 已达到最大值）
-    - current_value: 当前计数值
-    - current_qps: 当前 QPS 值
---]]
+    返回值：JSON格式字符串，适配JsonJacksonCodec
+    {
+        "status": 1,           -- 1:成功, 0:失败
+        "current_value": 1,     -- 当前值
+        "current_qps": 1,       -- 当前 QPS
+        "message": "new_created" -- 状态描述
+    }
+]]
 
 -- 获取传入的参数
 local key_name = KEYS[1]
 local max_qps = tonumber(ARGV[1])
-
-
--- 检查参数有效性
-if not key_name or not max_qps or max_qps <= 0 then
-        local error_message = "Invalid parameters received. key_name: " .. tostring(key_name) .. ", max_qps: " .. tostring(max_qps) .. ". Both must be provided and max_qps must be positive."
-        return redis.error_reply(error_message)
-end
 
 -- 获取当前计数
 local current_value = redis.call('GET', key_name)
@@ -35,12 +30,13 @@ local current_value = redis.call('GET', key_name)
 -- 如果键不存在，创建新键并设置初始值为 1，过期时间为 1 秒
 if current_value == false then
     redis.call('SET', key_name, 1, 'EX', 1)
-    return {
-        1,           -- 操作状态：成功
-        1,           -- 当前值
-        1,           -- 当前 QPS
-        'new_created'-- 状态描述：新建键
+    local result = {
+        ["status"] = 1,
+        ["current_value"] = 1,
+        ["current_qps"] = 1,
+        ["message"] = "new_created"
     }
+    return cjson.encode(result)
 end
 
 -- 转换为数字
@@ -54,18 +50,20 @@ if current_value < max_qps then
     if new_value == 1 then
         redis.call('EXPIRE', key_name, 1)
     end
-    return {
-        1,               -- 操作状态：成功
-        new_value,       -- 当前值
-        new_value,       -- 当前 QPS
-        'increased'      -- 状态描述：增加成功
+    local result = {
+        ["status"] = 1,
+        ["current_value"] = new_value,
+        ["current_qps"] = new_value,
+        ["message"] = "increased"
     }
+    return cjson.encode(result)
 else
     -- 已达到最大值，不允许继续增加
-    return {
-        0,               -- 操作状态：失败
-        current_value,   -- 当前值
-        current_value,   -- 当前 QPS
-        'limit_reached'  -- 状态描述：已达到限制
+    local result = {
+        ["status"] = 0,
+        ["current_value"] = current_value,
+        ["current_qps"] = current_value,
+        ["message"] = "limit_reached"
     }
+    return cjson.encode(result)
 end

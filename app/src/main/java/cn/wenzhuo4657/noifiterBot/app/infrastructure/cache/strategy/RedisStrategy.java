@@ -11,6 +11,7 @@ import org.redisson.api.RScript;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
 
 public class RedisStrategy  extends   abstractCacheStrategy{
@@ -38,9 +39,17 @@ public class RedisStrategy  extends   abstractCacheStrategy{
         if(!StringUtils.isEmpty(redis.getPassword()))
             config.useSingleServer().setPassword(redis.getPassword());
 
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        // 禁用多态类型处理，避免需要@class字段
+        mapper.disable(com.fasterxml.jackson.databind.MapperFeature.USE_ANNOTATIONS);
+        mapper.disable(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        JsonJacksonCodec codec = new JsonJacksonCodec(mapper);
+        config.setCodec(codec);
+
         redissonClient = Redisson.create(config);
 
     }
+
 
     @Override
     public void set(String key, Object value) {
@@ -155,13 +164,32 @@ public class RedisStrategy  extends   abstractCacheStrategy{
 
             Object[] valuesArray = values != null ? values.toArray() : new Object[0];
 
+            // 使用STATUS返回类型，让Redisson返回原始字符串而不尝试JSON解析
             Object result = script.eval(RScript.Mode.READ_WRITE,
                                        luaScript,
-                                       RScript.ReturnType.VALUE,
+                                       RScript.ReturnType.STATUS,
                                        keysObjects,
                                        valuesArray);
 
-            return resultType != null ? resultType.cast(result) : (T) result;
+            // 如果期望的返回类型是String，直接返回
+            if (resultType == String.class) {
+                return resultType.cast(result);
+            }
+
+            // 对于复杂对象，需要手动处理JSON反序列化
+            try {
+                if (result instanceof String && resultType != String.class) {
+                    // 如果结果是字符串，但期望的是其他类型，说明是JSON字符串
+                    String jsonResult = (String) result;
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    return mapper.readValue(jsonResult, resultType);
+                } else {
+                    // 直接类型转换
+                    return resultType.cast(result);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("JSON反序列化失败: " + e.getMessage(), e);
+            }
         } catch (Exception e) {
             throw new RuntimeException("执行Lua脚本失败: " + e.getMessage(), e);
         }
@@ -182,13 +210,32 @@ public class RedisStrategy  extends   abstractCacheStrategy{
 
             Object[] valuesArray = values != null ? values.stream().map(v -> v.toString()).toArray() : new Object[0];
 
+            // 使用STATUS返回类型，让Redisson返回原始字符串而不尝试JSON解析
             Object result = script.evalSha(RScript.Mode.READ_WRITE,
                                          scriptSha1,
-                                         RScript.ReturnType.VALUE,
+                                         RScript.ReturnType.STATUS,
                                          keysObjects,
                                          valuesArray);
 
-            return resultType != null ? resultType.cast(result) : (T) result;
+            // 如果期望的返回类型是String，直接返回
+            if (resultType == String.class) {
+                return resultType.cast(result);
+            }
+
+            // 对于复杂对象，需要手动处理JSON反序列化
+            try {
+                if (result instanceof String && resultType != String.class) {
+                    // 如果结果是字符串，但期望的是其他类型，说明是JSON字符串
+                    String jsonResult = (String) result;
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    return mapper.readValue(jsonResult, resultType);
+                } else {
+                    // 直接类型转换
+                    return resultType.cast(result);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("JSON反序列化失败: " + e.getMessage(), e);
+            }
         } catch (Exception e) {
             throw new RuntimeException("执行Lua脚本(SHA1)失败: " + e.getMessage(), e);
         }
