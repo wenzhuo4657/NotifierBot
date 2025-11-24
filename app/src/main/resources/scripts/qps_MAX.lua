@@ -22,14 +22,22 @@
 
 -- 获取传入的参数
 local key_name = KEYS[1]
-local max_qps = tonumber(ARGV[1])
+local json_qps = ARGV[1]
+local success, max_qps_string = pcall(cjson.decode, json_qps)
+local max_qps=tonumber(max_qps_string)
+
+
+
+if not key_name or not max_qps or max_qps <= 0 then
+    return redis.error_reply('Invalid parameters: key_name=' .. key_name .. ', max_qps=' .. max_qps)
+end
 
 -- 获取当前计数
 local current_value = redis.call('GET', key_name)
 
--- 如果键不存在，创建新键并设置初始值为 1，过期时间为 1 秒
+-- 如果键不存在，创建新键并设置初始值为 1，过期时间为 10 秒
 if current_value == false then
-    redis.call('SET', key_name, 1, 'EX', 1)
+    redis.call('SET', key_name, 1, 'EX', 10)
     local result = {
         ["status"] = 1,
         ["current_value"] = 1,
@@ -48,7 +56,7 @@ if current_value < max_qps then
     local new_value = redis.call('INCR', key_name)
     -- 如果是第一次设置，确保有过期时间
     if new_value == 1 then
-        redis.call('EXPIRE', key_name, 1)
+        redis.call('EXPIRE', key_name, 10)
     end
     local result = {
         ["status"] = 1,
