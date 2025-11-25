@@ -1,9 +1,9 @@
 package cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.decorator;
 
 
-import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.INotifier;
+import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.*;
 
-public abstract class NotifierDecorator extends INotifier {
+public abstract class NotifierDecorator<H extends NotifierResult> extends IAbstractNotifier<NotifierConfig, NotifierMessage, H> {
 
     /**
      * 被装饰器的引用
@@ -11,7 +11,7 @@ public abstract class NotifierDecorator extends INotifier {
     protected INotifier notifier;
 
     public NotifierDecorator(INotifier notifier) {
-        if (notifier == null&& !notifier.isAvailable()){
+        if (notifier == null || !notifier.isAvailable()){
             throw new IllegalArgumentException("Notifier is not available");
         }
         this.notifier = notifier;

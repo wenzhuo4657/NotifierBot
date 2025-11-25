@@ -1,12 +1,9 @@
-package cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.Impl;
+package cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.email;
 
 
 
 
-import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.INotifier;
-import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierConfig;
-import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierMessage;
-import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierResult;
+import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.*;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
@@ -17,18 +14,18 @@ import java.io.File;
 
 import java.util.Properties;
 
-public class EmailNotifier extends INotifier {
+public class EmailNotifier extends IAbstractNotifier<GmailConfig, NotifierMessage,NotifierResult> {
 
 
-    public EmailNotifier(NotifierConfig config) {
+    public EmailNotifier(GmailConfig config) {
         super(config);
     }
     Session session;
 
-    @Override
+  @Override
     public NotifierResult send(NotifierMessage message) {
 
-        GmailConfig config = (GmailConfig)getConfig();
+        GmailConfig config = getConfig();
         String from = config.getFrom();
         String to = config.getTo();
         String title = message.getTitle();
@@ -68,30 +65,30 @@ public class EmailNotifier extends INotifier {
         }catch (Exception e){
             e.printStackTrace();
             return NotifierResult.fail();
-        }finally {
-
         }
 
 
         return NotifierResult.ok();
     }
 
+
+
     @Override
     public boolean isAvailable() {
-
-        if (getConfig() instanceof  GmailConfig){
+        try {
             NotifierMessage message = new NotifierMessage();
             message.setTitle("Test Email");
             message.setContent("This is a test email sent from the EmailNotifier.");
             send(message);
             return true;
-        }else {
-         throw new IllegalArgumentException("Email config not supported");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
 
-    public Session getSession(String from,String password){
+    private Session getSession(String from,String password){
         try {
             if (session != null&&session.getStore().isConnected()){
                 return session;
@@ -132,4 +129,5 @@ public class EmailNotifier extends INotifier {
 
 
     }
+
 }

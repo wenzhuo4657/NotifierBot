@@ -35,9 +35,9 @@ end
 -- 获取当前计数
 local current_value = redis.call('GET', key_name)
 
--- 如果键不存在，创建新键并设置初始值为 1，过期时间为 10 秒
+-- 如果键不存在，创建新键并设置初始值为 1，过期时间为 3 秒
 if current_value == false then
-    redis.call('SET', key_name, 1, 'EX', 10)
+    redis.call('SET', key_name, 1, 'EX', 3)
     local result = {
         ["status"] = 1,
         ["current_value"] = 1,
@@ -56,7 +56,7 @@ if current_value < max_qps then
     local new_value = redis.call('INCR', key_name)
     -- 如果是第一次设置，确保有过期时间
     if new_value == 1 then
-        redis.call('EXPIRE', key_name, 10)
+        redis.call('EXPIRE', key_name, 3)
     end
     local result = {
         ["status"] = 1,

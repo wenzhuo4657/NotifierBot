@@ -23,8 +23,16 @@ public class NotifierResult {
 
     @Override
     public String toString() {
-        return "测试结果：NotifierResult{" +
+        return "通知结果：NotifierResult{" +
                 "isSuccess=" + isSuccess +
                 '}';
+    }
+
+    public boolean isSuccess() {
+        return isSuccess;
+    }
+
+    public void setSuccess(boolean success) {
+        isSuccess = success;
     }
 }

@@ -1,4 +1,4 @@
-package cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.Impl;
+package cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.email;
 
 
 import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierConfig;

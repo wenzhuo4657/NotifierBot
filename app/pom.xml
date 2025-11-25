@@ -52,6 +52,7 @@
         <telegrambots.version>9.2.0</telegrambots.version>
         <wechaty.version>0.1.5-SNAPSHOT</wechaty.version>
         <redisson.version>3.38.1</redisson.version>
+        <fastJson.version>2.0.43</fastJson.version>
     </properties>
 
     <!-- ==================== 依赖管理 ==================== -->
@@ -94,6 +95,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>${fastJson.version}</version>
         </dependency>
 
 

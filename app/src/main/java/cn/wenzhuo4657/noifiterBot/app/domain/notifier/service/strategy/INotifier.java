@@ -7,23 +7,14 @@ package cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy;
  *  * todo 暂时不涉及通知器复用，后续如果想要复用需要考虑 （1）通知配置和通知器解耦，（2）设计模式 工厂模式、管理器模式
  *
  */
-public abstract class INotifier {
-
-     NotifierConfig config;
+public  interface INotifier<T extends  NotifierConfig, R extends NotifierMessage,H extends  NotifierResult> {
 
 
-    public INotifier(NotifierConfig config) {
-        this.config = config;
-    }
-
-
-    public INotifier() {
-    }
 
     /**
      * 发送通知
      */
-    public abstract NotifierResult send(NotifierMessage message);
+    public abstract H send(R message);
 
 
     /**
@@ -37,7 +28,11 @@ public abstract class INotifier {
     public abstract void destroy();
 
 
-    public NotifierConfig getConfig() {
-        return config;
-    }
+    public T getConfig();
+
+
+    /**
+     * 获取通知起允许的最大qps
+     */
+    public  int getQps();
 }
