@@ -21,10 +21,8 @@ public abstract class IAbstractNotifier<T extends NotifierConfig, R extends Noti
 
     @Override
     public int getQps() {
-        return 5;
+        return 20;
 //        todo 目前qps是在抽象层统一，但后续需要做到在配置中读取，便于更改
     }
-
-
 
 }

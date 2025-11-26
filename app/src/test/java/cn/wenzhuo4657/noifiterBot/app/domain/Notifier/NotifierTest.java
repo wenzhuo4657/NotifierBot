@@ -83,6 +83,7 @@ public class NotifierTest {
      */
     @Test
     public  void testNotify() throws InterruptedException {
+        int sum =1000;//并发测试数量
 //        1，初始化实例
         TgBotConfig tgBotConfig=new TgBotConfig();
         tgBotConfig.setBotToken(System.getenv("tgBot"));
@@ -90,8 +91,8 @@ public class NotifierTest {
         QpsMaxDecorator qpsMaxDecorator=new QpsMaxDecorator(tgBotNotifier,globalCache);
 
         // 2，设置线程池和计数器
-        ExecutorService executorService = Executors.newFixedThreadPool(100);
-        CountDownLatch latch = new CountDownLatch(100);
+        ExecutorService executorService = Executors.newFixedThreadPool(sum);
+        CountDownLatch latch = new CountDownLatch(sum);
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failCount = new AtomicInteger(0);
 
@@ -99,7 +100,7 @@ public class NotifierTest {
         long startTime = System.currentTimeMillis();
         log.info("开始QPS限制脚本并行性能测试，100个线程同时发送请求");
 
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= sum;i++ ) {
             final int requestId = i;
             executorService.submit(() -> {
                 try {
@@ -126,6 +127,7 @@ public class NotifierTest {
                     latch.countDown();
                 }
             });
+            Thread.sleep(10);
         }
 
         // 等待所有线程完成
@@ -137,7 +139,7 @@ public class NotifierTest {
         long duration = endTime - startTime;
 
         System.out.println("✅ QPS限制脚本并行性能测试完成:");
-        System.out.println("   总请求数: 100");
+        System.out.println("   总请求数: "+sum);
         System.out.println("   成功请求: " + successCount.get());
         System.out.println("   失败请求: " + failCount.get());
         System.out.println("   执行时间: " + duration + "ms");

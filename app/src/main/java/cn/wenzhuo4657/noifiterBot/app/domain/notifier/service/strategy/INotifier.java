@@ -35,4 +35,11 @@ public  interface INotifier<T extends  NotifierConfig, R extends NotifierMessage
      * 获取通知起允许的最大qps
      */
     public  int getQps();
+
+
+    /**
+     * 通知器唯一性保证
+     * todo 目前底层均用拼接配置的字符串的hashcode，但仍有hash冲突的风险
+     */
+    public  String getName();
 }

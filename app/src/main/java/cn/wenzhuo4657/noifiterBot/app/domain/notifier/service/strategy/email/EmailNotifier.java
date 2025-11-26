@@ -130,4 +130,9 @@ public class EmailNotifier extends IAbstractNotifier<GmailConfig, NotifierMessag
 
     }
 
+    @Override
+    public String getName() {
+        String s=getConfig().getFrom()+getConfig().getTo()+getConfig().getPassword();
+        return  "enail:"+s.hashCode();
+    }
 }

@@ -35,4 +35,9 @@ public abstract class NotifierDecorator<H extends NotifierResult> extends IAbstr
             notifier.destroy();
         }
     }
+
+    @Override
+    public String getName() {
+        throw new UnsupportedOperationException("Decorator does not support getName method");
+    }
 }

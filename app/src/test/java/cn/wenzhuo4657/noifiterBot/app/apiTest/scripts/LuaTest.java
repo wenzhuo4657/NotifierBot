@@ -63,16 +63,16 @@ public class LuaTest {
         ClassPathResource resource = new ClassPathResource("scripts/qps_MAX.lua");
         String qpsScript = FileCopyUtils.copyToString(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
 
-//        // 测试无效参数：max_qps为0或负数
-//        assertThrows(RuntimeException.class, () -> {
-//            cacheStrategy.executeLuaScript(qpsScript,
-//                    Arrays.asList("test:invalid"), Arrays.asList("0"), List.class);
-//        });
-//
-//        assertThrows(RuntimeException.class, () -> {
-//            cacheStrategy.executeLuaScript(qpsScript,
-//                    Arrays.asList("test:invalid"), Arrays.asList("-1"), List.class);
-//        });
+        // 测试无效参数：max_qps为0或负数
+        assertThrows(RuntimeException.class, () -> {
+            cacheStrategy.executeLuaScript(qpsScript,
+                    Arrays.asList("test:invalid"), Arrays.asList("0"), List.class);
+        });
+
+        assertThrows(RuntimeException.class, () -> {
+            cacheStrategy.executeLuaScript(qpsScript,
+                    Arrays.asList("test:invalid"), Arrays.asList("-1"), List.class);
+        });
 
         // 测试正确参数 - 使用新的JSON返回格式
         assertDoesNotThrow(() -> {

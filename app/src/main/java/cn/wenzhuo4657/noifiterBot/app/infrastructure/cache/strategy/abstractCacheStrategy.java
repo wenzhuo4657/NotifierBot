@@ -1,6 +1,8 @@
 package cn.wenzhuo4657.noifiterBot.app.infrastructure.cache.strategy;
 
 import cn.wenzhuo4657.noifiterBot.app.config.CacheConfiguration;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
 /**
@@ -20,6 +22,10 @@ public abstract class abstractCacheStrategy implements CacheStrategy {
      * 构建key
      */
     public String buildKey(String key){
+
+        if (StringUtils.isEmpty(key)){//避免构造无效key
+            return null;
+        }
         return cacheConfiguration.getKeyPrefix() + ":" +name()+ ":"+key;
     }
 

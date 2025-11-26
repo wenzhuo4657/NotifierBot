@@ -5,4 +5,7 @@ package cn.wenzhuo4657.noifiterBot.app.types.cache;
  */
 public class CacheKey {
 
+
+    public  static String lua_key="script:lua";
+
 }

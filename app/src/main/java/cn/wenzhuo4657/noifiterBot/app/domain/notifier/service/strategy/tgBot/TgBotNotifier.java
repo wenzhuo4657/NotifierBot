@@ -60,4 +60,10 @@ public class TgBotNotifier extends IAbstractNotifier<TgBotConfig, TgBotNotifierM
         telegramClient=null;
 
     }
+
+    @Override
+    public String getName() {
+        TgBotConfig config = getConfig();
+        return "Tgbot"+config.getBotToken().hashCode();
+    }
 }

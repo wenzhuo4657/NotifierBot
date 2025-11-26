@@ -1,13 +1,16 @@
 package cn.wenzhuo4657.noifiterBot.app.infrastructure.cache.strategy;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import cn.wenzhuo4657.noifiterBot.app.config.CacheConfiguration;
 import cn.wenzhuo4657.noifiterBot.app.config.CacheConfiguration.Redis;
 import cn.wenzhuo4657.noifiterBot.app.types.cache.CacheType;
+import org.redisson.api.RMap;
 import org.redisson.api.RScript;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
@@ -60,27 +63,91 @@ public class RedisStrategy  extends   abstractCacheStrategy{
 
     @Override
     public void set(String key, Object value) {
+        key=buildKey(key);
+        if (value instanceof String){
+            redissonClient.getBucket(key).set(value);
+        }else if (value instanceof Map<?,?>){
+            RMap<Object, Object> map = redissonClient.getMap(key);
+            map.putAll((Map<?, ?>) value);
+        }else {
+//            其他类型，通过序列化转为json
+            redissonClient.getBucket(key).set(value);
+        }
 
     }
 
     @Override
     public void set(String key, Object value, long timeout, TimeUnit timeUnit) {
+        key=buildKey(key);
+        Duration duration = Duration.of(timeout, timeUnit.toChronoUnit());
+        if (value instanceof String){
+            redissonClient.getBucket(key).set(value, duration);
+        }else if (value instanceof Map<?,?>){
+            RMap<Object, Object> map = redissonClient.getMap(key);
+            map.expire(duration);
+            map.putAll((Map<?, ?>) value);
+        }else {
+//            其他类型，通过默认序列化转为json
+            redissonClient.getBucket(key).set(value, duration);
+        }
 
     }
 
     @Override
     public <T> T get(String key, Class<T> clazz) {
-        return null;
+        if (!hasKey(key)||clazz == null) {
+            return null;
+        }
+        key=buildKey(key);
+
+        try {
+
+            if (clazz.isAssignableFrom(String.class)){
+                return clazz.cast(redissonClient.getBucket(key).get());
+            } else if (clazz.isAssignableFrom(Map.class)){
+                RMap<Object, Object> map = redissonClient.getMap(key);
+                return clazz.cast(map);
+            }else {
+                return clazz.cast(redissonClient.getBucket(key).get());
+            }
+
+        } catch (Exception e) {
+            // 发生异常时返回null，避免影响业务流程
+            return null;
+        }
     }
 
     @Override
     public Boolean delete(String key) {
-        return null;
+        key=buildKey(key);
+        if (key == null) {
+            return false;
+        }
+
+        try {
+            // 尝试删除所有可能的数据结构类型的key
+            // Redisson的delete会删除指定key，无论其类型
+            return redissonClient.getKeys().delete(key) > 0;
+        } catch (Exception e) {
+            // 删除过程中发生异常
+            return false;
+        }
     }
 
     @Override
     public Boolean hasKey(String key) {
-        return null;
+        key=buildKey(key);
+        if (key == null) {
+            return false;
+        }
+
+        try {
+            // 使用Redisson的keys API检查key是否存在
+            return redissonClient.getKeys().countExists(key) > 0;
+        } catch (Exception e) {
+            // 检查过程中发生异常
+            return false;
+        }
     }
 
     @Override
@@ -146,14 +213,90 @@ public class RedisStrategy  extends   abstractCacheStrategy{
 
     @Override
     public Long getExpire(String key, TimeUnit timeUnit) {
-        return 0L;
+        if (!hasKey(key)) {
+            return null;
+        }
+        key=buildKey(key);
+
+        try {
+
+
+            // 尝试从不同类型的数据结构获取过期时间
+            // 先尝试bucket
+            if (redissonClient.getBucket(key).isExists()) {
+                return redissonClient.getBucket(key).remainTimeToLive();
+            }
+
+            // 尝试set
+            if (redissonClient.getSet(key).isExists()) {
+                return redissonClient.getSet(key).remainTimeToLive();
+            }
+
+            // 尝试map
+            if (redissonClient.getMap(key).isExists()) {
+                return redissonClient.getMap(key).remainTimeToLive();
+            }
+
+            // 如果以上都不匹配，使用通用的key过期时间查询
+            // Redisson没有直接的getKeysTimeout方法，我们使用TTL命令
+            Long ttlResult = redissonClient.getScript().eval(
+                RScript.Mode.READ_ONLY,
+                "return redis.call('TTL', KEYS[1])",
+                RScript.ReturnType.INTEGER,
+                java.util.Collections.singletonList(key)
+            );
+
+            // 转换时间单位
+            if (ttlResult != null && ttlResult > 0) {
+                long seconds = ttlResult;
+                return timeUnit.convert(seconds, TimeUnit.SECONDS);
+            }
+            return ttlResult;
+
+        } catch (Exception e) {
+            // 获取过期时间过程中发生异常
+            return -1L;
+        }
     }
 
 
 
     @Override
     public Boolean expire(String key, long timeout, TimeUnit timeUnit) {
-        return null;
+        if (!hasKey(key)) {
+            return null;
+        }
+        key=buildKey(key);
+
+        try {
+            // 检查key是否存在
+            if (!hasKey(key)) {
+                return false;
+            }
+
+            // 尝试为不同类型的数据结构设置过期时间
+            // 先尝试bucket
+            if (redissonClient.getBucket(key).isExists()) {
+                return redissonClient.getBucket(key).expire(timeout, timeUnit);
+            }
+
+            // 尝试set
+            if (redissonClient.getSet(key).isExists()) {
+                return redissonClient.getSet(key).expire(timeout, timeUnit);
+            }
+
+            // 尝试map
+            if (redissonClient.getMap(key).isExists()) {
+                return redissonClient.getMap(key).expire(timeout, timeUnit);
+            }
+
+            // 如果以上都不匹配，使用通用的key过期时间设置
+            return redissonClient.getKeys().expire(key, timeout, timeUnit);
+
+        } catch (Exception e) {
+            // 设置过期时间过程中发生异常
+            return false;
+        }
     }
 
     @Override
@@ -161,6 +304,7 @@ public class RedisStrategy  extends   abstractCacheStrategy{
         if (!isAvailable()) {
             throw new RuntimeException("Redis连接不可用，无法执行Lua脚本");
         }
+        keys=keys.stream().map(key->buildKey(key)).collect(Collectors.toList());
 
         try {
             RScript script = redissonClient.getScript();
@@ -207,6 +351,7 @@ public class RedisStrategy  extends   abstractCacheStrategy{
         if (!isAvailable()) {
             throw new RuntimeException("Redis连接不可用，无法执行Lua脚本");
         }
+        keys=keys.stream().map(key->buildKey(key)).collect(Collectors.toList());
 
         try {
             RScript script = redissonClient.getScript();

@@ -8,7 +8,7 @@ cache:
   active-type: redis
 
   # 缓存键前缀
-  key-prefix: "app:cache:"
+  key-prefix: "app:cache"
 
   # Redis 配置 (使用Redisson客户端)
   redis:

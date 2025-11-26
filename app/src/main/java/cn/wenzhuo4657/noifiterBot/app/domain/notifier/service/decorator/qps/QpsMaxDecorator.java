@@ -6,6 +6,7 @@ import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierC
 import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierMessage;
 import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierResult;
 import cn.wenzhuo4657.noifiterBot.app.infrastructure.cache.GlobalCache;
+import cn.wenzhuo4657.noifiterBot.app.types.cache.ScriptCacheUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
 
@@ -23,22 +24,19 @@ public class QpsMaxDecorator extends NotifierDecorator<QpsResult> {
         this.globalCache=globalCache;
     }
 
+
     @Override
     public QpsResult send(NotifierMessage message) {
         QpsResponse result;
         NotifierResult result1;
         try {
-            //        1,todo 获取脚本加载的哈希（全局统一加载，需要分布式缓存）
-            ClassPathResource resource = new ClassPathResource("scripts/qps_MAX.lua");
-            String qpsScript = FileCopyUtils.copyToString(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
-            String scriptSha1  = globalCache.loadLuaScript(qpsScript);
+
+            String scriptSha1 = ScriptCacheUtils.loadScript(ScriptCacheUtils.Script.qps, globalCache);
 //        2，调用脚本
             // 使用SHA1执行脚本
-            String qpsKey = "test:qps:sha1";//todo 在types中统一管理redis键
-            int maxQps = notifier.getQps();
 
-            // 清理可能存在的键
-            globalCache.delete(qpsKey);
+            String qpsKey = ScriptCacheUtils.Script.qps.getScriptType().getKey()+":"+ScriptCacheUtils.Script.qps.getFileName()+":data:"+notifier.getName();
+            int maxQps = notifier.getQps();
 
             // 使用SHA1执行测试
             result = globalCache.executeLuaScriptSha1(scriptSha1,
