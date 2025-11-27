@@ -10,7 +10,7 @@ RUN mvn clean package -DskipTests
 # todo 这里或许应该考虑将mq和redis一起部署了？否则太过简单了
 FROM btgoose/jdk17:latest
 MAINTAINER jacka7732
-COPY target/app-1.0-SNAPSHOT.jar app.jar
+COPY --from=builder /app/target/app-1.0-SNAPSHOT.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["sh","-c","java -jar $JAVA_OPTS app.jar"]
 
