@@ -4,6 +4,7 @@ package cn.wenzhuo4657.noifiterBot.app.domain.notifier;
 /**
  * 通知器领域
  *
+ * 核心功能： 通知器的发送能力，专注于通知器本身的api
  * 领域服务接口：
  * 1.注册通信器：
  *  入参： 通信器校验参数、通信器类型
@@ -15,8 +16,6 @@ package cn.wenzhuo4657.noifiterBot.app.domain.notifier;
  *3，通信器状态
  *  入参： 通信器索引
  *  返回：通信器状态
- *
- *
  *
  *
  */
