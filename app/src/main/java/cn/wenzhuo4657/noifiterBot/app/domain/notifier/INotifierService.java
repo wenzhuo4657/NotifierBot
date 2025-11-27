@@ -1,5 +1,9 @@
 package cn.wenzhuo4657.noifiterBot.app.domain.notifier;
 
+import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierMessage;
+
+import java.util.List;
+
 public interface INotifierService {
 
     /**
@@ -9,18 +13,18 @@ public interface INotifierService {
      * @param type  通知器类型
      * @return  通信器索引（雪花算法实现）
      */
-    long registerCommunicator(String paramsJson, String type);
+    long registerCommunicator(String paramsJson, String type,String [] decorator);
 
 
     /**
      * 发送通信
      *
      * @param communicatorIndex  通信器索引
-     * @param text  通知内容
-     * @param type   通信器类型
+     * @param paramsJson  发送参数-json格式
+     * @param type  通知器类型
      * @return true-成功，false-失败
      */
-    boolean sendInfo(long communicatorIndex, String text, String type);
+    boolean sendInfo(long communicatorIndex , String paramsJson,String type);
 
 
     /**
@@ -30,4 +34,16 @@ public interface INotifierService {
      * @return true-正常，false-异常
      */
     boolean checkCommunicatorStatus(long communicatorIndex);
+
+
+    /**
+     * 查询支持的通知器
+     */
+    List<String> querySupportNotifier();
+
+
+    /**
+     * 查询支持的增强功能
+     */
+    List<String> querySupportDecorator();
 }

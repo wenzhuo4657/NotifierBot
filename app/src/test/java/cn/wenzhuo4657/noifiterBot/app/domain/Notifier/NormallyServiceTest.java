@@ -1,0 +1,44 @@
+package cn.wenzhuo4657.noifiterBot.app.domain.Notifier;
+
+import cn.wenzhuo4657.noifiterBot.app.domain.notifier.INotifierService;
+import cn.wenzhuo4657.noifiterBot.app.domain.notifier.NormallyService;
+import cn.wenzhuo4657.noifiterBot.app.domain.notifier.model.vo.ConfigType;
+import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierResult;
+import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.tgBot.TgBotConfig;
+import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.tgBot.TgBotNotifierMessage;
+import com.alibaba.fastjson2.JSON;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+public class NormallyServiceTest {
+
+
+    @Autowired
+    private INotifierService normallyService;
+
+
+
+    @Test
+    public  void  test(){
+        TgBotConfig tgBotConfig=new TgBotConfig();
+        tgBotConfig.setBotToken(System.getenv("tgBot"));
+        String json= JSON.toJSONString(tgBotConfig);
+        String  type= ConfigType.Strategy.TgBot.getCode();
+        String[]  decorator={ConfigType.Decorator.Qps.getCode()};
+        long index = normallyService.registerCommunicator(json, type, decorator);
+
+        TgBotNotifierMessage message=new TgBotNotifierMessage();
+        message.setChatId("6550266873");
+        message.setTitle("test");
+        message.setContent("test");
+        String  jsonMessage  = JSON.toJSONString(message);
+        boolean send = normallyService.sendInfo(index,jsonMessage,type);
+        System.out.println("send: "+send);
+
+
+    }
+
+
+}
