@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class NormallyService implements  INotifierService{
@@ -38,22 +40,22 @@ public class NormallyService implements  INotifierService{
     }
 
     @Override
-    public List<String> querySupportNotifier() {
+    public Map<String,String> querySupportNotifier() {
         ConfigType.Strategy[] strategies = ConfigType.Strategy.values();
-        List<String> list = new ArrayList<>();
+        Map<String,String> map = new HashMap<>();
         for (ConfigType.Strategy strategy : strategies) {
-            list.add(strategy.getCode());
+            map.put(strategy.getCode(),strategy.getDescription());
         }
-        return list;
+        return map;
     }
 
     @Override
-    public List<String> querySupportDecorator() {
+    public Map<String,String> querySupportDecorator() {
         ConfigType.Decorator[] decorators = ConfigType.Decorator.values();
-        List<String> list = new ArrayList<>();
+        Map<String,String> map = new HashMap<>();
         for (ConfigType.Decorator decorator : decorators) {
-            list.add(decorator.getCode());
+            map.put(decorator.getCode(), decorator.getDescription());
         }
-        return list;
+        return map;
     }
 }

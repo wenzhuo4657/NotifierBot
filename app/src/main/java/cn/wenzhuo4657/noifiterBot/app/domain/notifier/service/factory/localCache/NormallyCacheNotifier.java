@@ -27,7 +27,7 @@ public class NormallyCacheNotifier implements CacheNotifier {
      * Caffeine 缓存实例
      * 配置：
      * - 最大容量：10,000 个通知器实例
-     * - 写入后过期时间：60 分钟
+     * - 无活跃后过期时间：60 分钟
      * - 初始容量：100
      */
     private final Cache<String, INotifier> cache;
@@ -40,7 +40,7 @@ public class NormallyCacheNotifier implements CacheNotifier {
                 // 最大缓存数量
                 .maximumSize(10_000)
                 // 写入后30分钟过期
-                .expireAfterWrite(60, TimeUnit.MINUTES)
+                .expireAfterAccess(60, TimeUnit.MINUTES)
                 // 初始容量
                 .initialCapacity(100)
                 // 启用缓存统计

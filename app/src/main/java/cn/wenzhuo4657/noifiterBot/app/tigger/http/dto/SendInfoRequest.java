@@ -12,10 +12,9 @@ public class SendInfoRequest {
 
     private Long communicatorIndex;
 
-    @JsonProperty("paramsJson")
+
     private String paramsJson;
 
-    @JsonProperty("type")
     private String type;
 
     public SendInfoRequest() {}

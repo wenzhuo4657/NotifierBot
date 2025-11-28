@@ -1,3 +1,6 @@
+
 spring:
   profiles:
     active: cache
+server:
+  port: 8089

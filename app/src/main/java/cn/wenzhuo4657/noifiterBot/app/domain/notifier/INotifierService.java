@@ -3,6 +3,7 @@ package cn.wenzhuo4657.noifiterBot.app.domain.notifier;
 import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierMessage;
 
 import java.util.List;
+import java.util.Map;
 
 public interface INotifierService {
 
@@ -39,11 +40,11 @@ public interface INotifierService {
     /**
      * 查询支持的通知器
      */
-    List<String> querySupportNotifier();
+    Map<String,String> querySupportNotifier();
 
 
     /**
      * 查询支持的增强功能
      */
-    List<String> querySupportDecorator();
+    Map<String,String> querySupportDecorator();
 }

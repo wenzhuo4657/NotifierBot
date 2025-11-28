@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 通知器核心控制器
@@ -116,6 +117,7 @@ public class NotifierCoreController {
         }
     }
 
+
     /**
      * 检查通信器状态
      */
@@ -151,22 +153,26 @@ public class NotifierCoreController {
         }
     }
 
+
+
+
+
     /**
      * 查询支持的通知器类型
      */
     @GetMapping("/support/notifiers")
-    public ApiResponse<List<String>> querySupportNotifiers(HttpServletRequest httpRequest) {
+    public ApiResponse<Map<String,String>> querySupportNotifiers(HttpServletRequest httpRequest) {
 
         String requestId = generateRequestId(httpRequest);
         logger.info("查询支持的通知器类型: requestId={}", requestId);
 
         try {
-            List<String> notifiers = notifierService.querySupportNotifier();
+            Map<String,String> notifiers = notifierService.querySupportNotifier();
 
             logger.info("查询支持的通知器类型完成: requestId={}, count={}",
                        requestId, notifiers != null ? notifiers.size() : 0);
 
-            ApiResponse<List<String>> notifierResponse =
+            ApiResponse<Map<String,String>> notifierResponse =
                 ApiResponse.success("查询成功", notifiers);
             notifierResponse.setRequestId(requestId);
             return notifierResponse;
@@ -175,7 +181,7 @@ public class NotifierCoreController {
             logger.error("查询支持的通知器类型异常: requestId={}, error={}",
                         requestId, e.getMessage(), e);
 
-            ApiResponse<List<String>> notifierErrorResponse =
+            ApiResponse<Map<String,String>> notifierErrorResponse =
                 ApiResponse.error("查询异常: " + e.getMessage());
             notifierErrorResponse.setRequestId(requestId);
             return notifierErrorResponse;
@@ -186,18 +192,18 @@ public class NotifierCoreController {
      * 查询支持的装饰器类型
      */
     @GetMapping("/support/decorators")
-    public ApiResponse<List<String>> querySupportDecorators(HttpServletRequest httpRequest) {
+    public ApiResponse<Map<String,String>> querySupportDecorators(HttpServletRequest httpRequest) {
 
         String requestId = generateRequestId(httpRequest);
         logger.info("查询支持的装饰器类型: requestId={}", requestId);
 
         try {
-            List<String> decorators = notifierService.querySupportDecorator();
+            Map<String,String> decorators = notifierService.querySupportDecorator();
 
             logger.info("查询支持的装饰器类型完成: requestId={}, count={}",
                        requestId, decorators != null ? decorators.size() : 0);
 
-            ApiResponse<List<String>> decoratorResponse =
+            ApiResponse<Map<String,String>> decoratorResponse =
                 ApiResponse.success("查询成功", decorators);
             decoratorResponse.setRequestId(requestId);
             return decoratorResponse;
@@ -206,7 +212,7 @@ public class NotifierCoreController {
             logger.error("查询支持的装饰器类型异常: requestId={}, error={}",
                         requestId, e.getMessage(), e);
 
-            ApiResponse<List<String>> decoratorErrorResponse =
+            ApiResponse<Map<String,String>> decoratorErrorResponse =
                 ApiResponse.error("查询异常: " + e.getMessage());
             decoratorErrorResponse.setRequestId(requestId);
             return decoratorErrorResponse;

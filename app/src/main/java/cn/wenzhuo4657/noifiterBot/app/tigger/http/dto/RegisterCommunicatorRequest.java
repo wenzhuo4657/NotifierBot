@@ -11,7 +11,7 @@ public class RegisterCommunicatorRequest {
 
     private String type;
 
-    @JsonProperty("decorators")
+
     private String[] decorators;
 
     public RegisterCommunicatorRequest() {}

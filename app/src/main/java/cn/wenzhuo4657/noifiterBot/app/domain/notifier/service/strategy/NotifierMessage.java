@@ -9,10 +9,9 @@ public class NotifierMessage {
 
     private String content;
 
-    private File file; // 附件（可选）
+    private String file; // 附件（可选）
 
 
-    private  String dynamicConfigJson;//可选字段，他用于适配不同通知器所需要的动态参数
 
 
     public String getTitle() {
@@ -32,19 +31,11 @@ public class NotifierMessage {
         this.content = content;
     }
 
-    public File getFile() {
+    public String getFile() {
         return file;
     }
 
-    public void setFile(File file) {
+    public void setFile(String file) {
         this.file = file;
-    }
-
-    public String getDynamicConfigJson() {
-        return dynamicConfigJson;
-    }
-
-    public void setDynamicConfigJson(String dynamicConfigJson) {
-        this.dynamicConfigJson = dynamicConfigJson;
     }
 }
