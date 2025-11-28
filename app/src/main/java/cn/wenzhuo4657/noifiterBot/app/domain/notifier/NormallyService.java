@@ -36,7 +36,11 @@ public class NormallyService implements  INotifierService{
 
     @Override
     public boolean checkCommunicatorStatus(long communicatorIndex) {
-        return true;
+        INotifier iNotifier = pondFactory.get(communicatorIndex);
+        if (iNotifier != null&&iNotifier.isAvailable()){
+            return true;
+        }
+        return false;
     }
 
     @Override

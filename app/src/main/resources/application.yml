@@ -2,5 +2,11 @@
 spring:
   profiles:
     active: cache
+  thymeleaf:
+    enabled: true
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    cache: false
 server:
   port: 8089

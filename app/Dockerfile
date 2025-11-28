@@ -11,7 +11,6 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jre
 LABEL maintainer="jacka7732"
 COPY --from=builder /app/target/app-1.0-SNAPSHOT.jar app.jar
-EXPOSE 8080
 ENTRYPOINT ["sh","-c","java -jar $JAVA_OPTS app.jar"]
 
 
