@@ -122,15 +122,29 @@
     <!-- ==================== 构建配置 ==================== -->
     <build>
         <!-- 插件配置 -->
+
         <plugins>
             <!-- Spring Boot Maven插件：用于打包可执行jar文件 -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <!-- 指定主类路径，cn.wenzhuo4657.noifiterBot变量会被替换为实际包名 -->
-                    <mainClass>cn.wenzhuo4657.noifiterBot.Application</mainClass>
-                </configuration>
+                <executions>
+
+                    <!--                    每一个<execution>都是一个归档包的定义 -->
+                    <!--                    可执行jar包配置-->
+                    <execution>
+                        <id>repackage</id>
+
+                        <goals>
+                            <!--                            绑定生命周期在package后-->
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+
+                            <attach>true</attach>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- Maven编译插件：确保使用正确的Java版本编译 -->
