@@ -8,7 +8,7 @@ RUN mvn clean package -DskipTests
 
 # 运行阶段 - 使用轻量级 JRE
 # todo 这里或许应该考虑将mq和redis一起部署了？否则太过简单了
-FROM btgoose/jdk17:latest
+FROM eclipse-temurin:17-jre
 MAINTAINER jacka7732
 COPY --from=builder /app/target/app-1.0-SNAPSHOT.jar app.jar
 EXPOSE 8080
