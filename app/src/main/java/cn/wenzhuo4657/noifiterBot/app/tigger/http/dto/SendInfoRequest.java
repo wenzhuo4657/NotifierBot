@@ -1,7 +1,7 @@
 package cn.wenzhuo4657.noifiterBot.app.tigger.http.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -17,12 +17,24 @@ public class SendInfoRequest {
 
     private String type;
 
+    private MultipartFile file;
+
     public SendInfoRequest() {}
 
-    public SendInfoRequest(Long communicatorIndex, String paramsJson, String type) {
+
+    public SendInfoRequest(Long communicatorIndex, String paramsJson, String type, MultipartFile file) {
         this.communicatorIndex = communicatorIndex;
         this.paramsJson = paramsJson;
         this.type = type;
+        this.file = file;
+    }
+
+    public MultipartFile getFile() {
+        return file;
+    }
+
+    public void setFile(MultipartFile file) {
+        this.file = file;
     }
 
     public Long getCommunicatorIndex() {
@@ -49,12 +61,14 @@ public class SendInfoRequest {
         this.type = type;
     }
 
+
     @Override
     public String toString() {
         return "SendInfoRequest{" +
                 "communicatorIndex=" + communicatorIndex +
                 ", paramsJson='" + paramsJson + '\'' +
                 ", type='" + type + '\'' +
+                ", file=" + file +
                 '}';
     }
 }

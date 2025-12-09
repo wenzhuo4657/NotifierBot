@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.File;
+
 @SpringBootTest
 public class NormallyServiceTest {
 
@@ -54,10 +56,19 @@ public class NormallyServiceTest {
         NotifierMessage notifierMessage = new NotifierMessage();
         notifierMessage.setTitle("test");
         notifierMessage.setContent("test");
-        boolean b = normallyService.sendInfo(index, JSON.toJSONString(notifierMessage), type);
+        File file = new File("C:\\working\\my-project\\NotifierBot\\devops.md");
+        boolean b = normallyService.sendInfo(index, JSON.toJSONString(notifierMessage), type,file);
         System.out.println("send: "+b);
 
 
+    }
+
+    public static void main(String[] args) {
+
+        NotifierMessage notifierMessage = new NotifierMessage();
+        notifierMessage.setTitle("test");
+        notifierMessage.setContent("test");
+        System.out.println(JSON.toJSONString(notifierMessage));
     }
 
 

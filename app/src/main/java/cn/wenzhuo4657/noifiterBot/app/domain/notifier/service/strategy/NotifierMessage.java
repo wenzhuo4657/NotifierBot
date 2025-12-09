@@ -1,6 +1,7 @@
 package cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy;
 
 import java.io.File;
+import java.io.InputStream;
 
 public class NotifierMessage {
 
@@ -9,7 +10,9 @@ public class NotifierMessage {
 
     private String content;
 
-    private String file; // 附件（可选）
+    private String file1; // 附件（可选,外部url）
+
+    private File file2;//附件（可选，上传文件）
 
 
 
@@ -31,11 +34,22 @@ public class NotifierMessage {
         this.content = content;
     }
 
-    public String getFile() {
-        return file;
+
+
+    public String getFile1() {
+        return file1;
     }
 
-    public void setFile(String file) {
-        this.file = file;
+    public void setFile1(String file1) {
+        this.file1 = file1;
+    }
+
+
+    public File getFile2() {
+        return file2;
+    }
+
+    public void setFile2(File file2) {
+        this.file2 = file2;
     }
 }

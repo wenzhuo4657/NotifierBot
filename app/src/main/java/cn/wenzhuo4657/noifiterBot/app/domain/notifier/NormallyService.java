@@ -4,10 +4,14 @@ import cn.wenzhuo4657.noifiterBot.app.domain.notifier.model.vo.ConfigType;
 import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.factory.IPondFactory;
 import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.INotifier;
 import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierMessage;
+import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierResult;
 import com.alibaba.fastjson2.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +25,6 @@ public class NormallyService implements  INotifierService{
     @Override
     public long registerCommunicator(String paramsJson, String type,String [] decorator) {
         return  pondFactory.init(paramsJson,type,decorator);
-
     }
 
     @Override
@@ -30,8 +33,19 @@ public class NormallyService implements  INotifierService{
         Class<? extends NotifierMessage> messageClass = strategy.getMessageClass();
         NotifierMessage message = JSON.parseObject(paramsJson, messageClass);
         INotifier notifier = pondFactory.get(communicatorIndex);
-        notifier.send(message);
-        return true;
+        NotifierResult send = notifier.send(message);
+        return send.isSuccess();
+    }
+
+    @Override
+    public boolean sendInfo(long communicatorIndex, String paramsJson, String type, File file) {
+        ConfigType.Strategy strategy = ConfigType.Strategy.find(type);
+        Class<? extends NotifierMessage> messageClass = strategy.getMessageClass();
+        NotifierMessage message = JSON.parseObject(paramsJson, messageClass);
+        message.setFile2(file);
+        INotifier notifier = pondFactory.get(communicatorIndex);
+        NotifierResult send = notifier.send(message);
+        return send.isSuccess();
     }
 
     @Override

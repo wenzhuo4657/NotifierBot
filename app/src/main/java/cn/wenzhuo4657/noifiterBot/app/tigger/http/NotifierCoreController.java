@@ -4,14 +4,19 @@ import cn.hutool.core.util.StrUtil;
 import cn.wenzhuo4657.noifiterBot.app.domain.notifier.INotifierService;
 import cn.wenzhuo4657.noifiterBot.app.domain.notifier.service.strategy.NotifierMessage;
 import cn.wenzhuo4657.noifiterBot.app.tigger.http.dto.*;
+import cn.wenzhuo4657.noifiterBot.app.types.utils.SnowflakeUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 
 /**
@@ -76,44 +81,60 @@ public class NotifierCoreController {
     /**
      * 发送通信信息
      */
-    @PostMapping("/send")
+    @PostMapping(value = "/send",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ApiResponse<String> sendInfo(
-            @Validated @RequestBody SendInfoRequest request,
+            @RequestParam("communicatorIndex") Long communicatorIndex,
+            @RequestParam("paramsJson") String paramsJson,
+            @RequestParam("type") String type,
+            @RequestParam("file") MultipartFile file,
             HttpServletRequest httpRequest) {
 
         String requestId = generateRequestId(httpRequest);
-        logger.info("发送信息请求: requestId={}, request={}", requestId, request);
+        logger.info("发送信息请求: requestId={}", requestId);
 
+        File tempFile = null;
         try {
+            // 将 MultipartFile 转换为临时文件
+            tempFile = Files.createTempFile("upload"+ SnowflakeUtils.getSnowflakeId(), "_" +file.getOriginalFilename()).toFile();
+            file.transferTo(tempFile);
+
             // 直接发送信息，不解析或修改JSON
             boolean result = notifierService.sendInfo(
-                request.getCommunicatorIndex(),
-                request.getParamsJson(),
-                request.getType()
+                communicatorIndex,
+                paramsJson,
+                type,
+                tempFile
             );
 
             if (result) {
                 logger.info("信息发送成功: requestId={}, communicatorIndex={}",
-                           requestId, request.getCommunicatorIndex());
+                           requestId, communicatorIndex);
                 ApiResponse<String> successResponse = ApiResponse.success("信息发送成功", "发送成功");
                 successResponse.setRequestId(requestId);
                 return successResponse;
             } else {
                 logger.warn("信息发送失败: requestId={}, communicatorIndex={}",
-                           requestId, request.getCommunicatorIndex());
+                           requestId, communicatorIndex);
                 ApiResponse<String> failResponse = ApiResponse.error("信息发送失败");
                 failResponse.setRequestId(requestId);
                 return failResponse;
             }
 
         } catch (Exception e) {
-            logger.error("发送信息异常: requestId={}, request={}, error={}",
-                        requestId, request, e.getMessage(), e);
+            logger.error("发送信息异常: requestId={}, error={}",
+                        requestId, e.getMessage(), e);
 
             ApiResponse<String> exceptionResponse =
                 ApiResponse.error("发送信息异常: " + e.getMessage());
             exceptionResponse.setRequestId(requestId);
             return exceptionResponse;
+        } finally {
+            // 清理临时文件
+            if (tempFile != null && tempFile.exists()) {
+                tempFile.delete();
+            }
         }
     }
 

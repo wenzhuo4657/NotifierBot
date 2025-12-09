@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
+import java.io.InputStream;
 import java.util.Properties;
 
 public class EmailNotifier extends IAbstractNotifier<GmailConfig, NotifierMessage,NotifierResult> {
@@ -34,11 +35,14 @@ public class EmailNotifier extends IAbstractNotifier<GmailConfig, NotifierMessag
         String title = message.getTitle();
         String content = message.getContent();
 
-        String url = message.getFile();
+        String url = message.getFile1();
+
+        File in = message.getFile2();
 
 
 
-        try {
+
+      try {
             Session session = getSession(config.getFrom(), config.getPassword());
 
             Message msg = new MimeMessage(session);
@@ -54,6 +58,13 @@ public class EmailNotifier extends IAbstractNotifier<GmailConfig, NotifierMessag
             html.setContent("<p>"+ content+"<br><a href='"+url+"'>附件</a>"+"</p>", "text/html; charset=UTF-8");
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(html);
+
+            if (in != null){
+                MimeBodyPart attach = new MimeBodyPart();
+                attach.attachFile(in);
+                multipart.addBodyPart(attach);
+            }
+
 
 
 
